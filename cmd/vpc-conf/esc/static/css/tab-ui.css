@@ -1,0 +1,46 @@
+/* tab-ui.js component */
+.tab {
+	overflow: hidden;
+	border: 1px solid #0071BC;
+	background-color: #0071BC;
+	margin-bottom: 6px;
+  }
+
+.tab button {
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	font-size: 17px;
+	color: #fff;
+	text-shadow: #555 1px 1px;
+	transition: 250ms background-color ease-out;
+}
+
+.tab button:hover {
+	background-color: #112E51;
+}
+
+.tab button.active {
+	background-color: #205493;
+}
+
+.tab-content {
+	display: none;
+	padding: 0px 0px;
+}
+
+.tab-content-bordered {
+	display: none;
+	padding: 0px 0px;
+	border: 1px solid #0071BC;
+	border-top: none;
+}
+
+.tab-sticky {
+    position: sticky;
+    top: 0px;
+}

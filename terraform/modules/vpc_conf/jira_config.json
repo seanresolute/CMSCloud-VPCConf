@@ -1,0 +1,13 @@
+{
+    "Project": "IA",
+	"IssueType": "10007",
+	"Statuses": {
+		"10102": "Submitted",
+		"3":     "InProgress",
+		"10004": "CancelledByRequester",
+		"10103": "Approved",
+		"10016": "Done"
+	},
+	"Watchers": [],
+	"Assignee": "LOVP"
+}

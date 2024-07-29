@@ -1,0 +1,60 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+@Library('corbalt') _
+
+def appToEnvToConfig = [
+    'creds-api': [
+        dev: [
+            region: 'us-gov-west-1',
+            role: 'arn:aws-us-gov:iam::350522771286:role/delegatedadmin/developer/cbc-jenkins',
+        ],
+        prod: [
+            region: 'us-gov-west-1',
+            role: 'arn:aws-us-gov:iam::350521122370:role/delegatedadmin/developer/cbc-jenkins',
+        ],
+    ],
+]
+
+stage ('GovCloudBuild') {
+    def appToTask = appToEnvToConfig.collectEntries { app, envToConfig ->
+        [(app): {
+            corbalt.inCMSCloudBuildPod {
+                def (defaultRegistry, dockerConfig) = corbalt.getDockerConfigForDockerHub()
+                def ecrHosts = []
+
+                checkout scm
+                def sha = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD').trim()
+
+                envToConfig.each { e, config ->
+                    if (e == 'prod' && env.BRANCH_NAME != 'master') {
+                        println 'Will not push to prod because this is not a merge to master'
+                        return
+                    }
+                    println "Getting ${e} creds"
+                    withEnv(corbalt.getIamRoleEnv(config.role)) {
+                        def (envEcrHost, envConfig) = corbalt.getDockerConfigForEcr(config.region)
+                        ecrHosts += envEcrHost
+                        dockerConfig.auths << envConfig.auths
+                    }
+                }
+
+                def targets = ecrHosts.collect { "${it}/${app}:${sha}" }
+                corbalt.kanikoBuild(targets, dockerConfig, context: './vpc-automation', dockerfile: "./vpc-automation/${app}.Dockerfile")
+
+                withEnv(corbalt.getIamRoleEnv('arn:aws-us-gov:iam::350521122370:role/delegatedadmin/developer/cbc-jenkins')) {
+                    container('aws') {
+                        sh 'aws --region=us-gov-west-1 s3 cp s3://vpc-automation-artifact-db/latest ./artifact-db'
+                        sh 'chmod +x ./artifact-db'
+                        def tags = JsonOutput.toJson([
+                            SHA: sha,
+                            ForAutomatedDeploy: sprintf("%s", env.BRANCH_NAME == 'master'),
+                        ])
+                        sh "./artifact-db --region us-gov-west-1 create -p ${app} -t '${tags}' -v ${app}:${sha}"
+                    }
+                }
+            }
+        }]
+    }
+    parallel(appToTask)
+}

@@ -1,0 +1,11 @@
+# This file builds an image that runs on Cloudbees Core.
+# The image must contain the 'cat' command since the pod
+# it runs in uses 'cat' to start the container.
+FROM golang:1.13 as build
+WORKDIR /src
+COPY ./ .
+RUN CGO_ENABLED=0 GOOS=linux GOBIN=/ go install
+
+FROM artifactory.cms.gov/geoapi-docker-hub/library/alpine
+RUN apk --update add ca-certificates
+COPY --from=build /artifact-db /bin/artifact-db

@@ -1,0 +1,44 @@
+[
+    {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/update-aws-accounts-${env}",
+          "awslogs-region": "${region}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "secrets": [
+        {
+          "valueFrom": "vpc-conf-${env}-cloudtamer-host",
+          "name": "CLOUDTAMER_BASE_URL"
+        },
+        {
+          "valueFrom": "vpc-conf-${env}-cloudtamer-service-account-username",
+          "name": "CLOUDTAMER_SERVICE_ACCOUNT_USERNAME"
+        },
+        {
+          "valueFrom": "vpc-conf-${env}-cloudtamer-service-account-password",
+          "name": "CLOUDTAMER_SERVICE_ACCOUNT_PASSWORD"
+        },
+        {
+          "valueFrom": "vpc-conf-${env}-cloudtamer-service-account-idms-id",
+          "name": "CLOUDTAMER_SERVICE_ACCOUNT_IDMS_ID"
+        },
+        {
+          "valueFrom": "vpc-conf-${env}-rds-conn-str",
+          "name": "POSTGRES_CONNECTION_STRING"
+        }
+      ],
+      "environment": [
+        {
+          "value": "UpdateAWSAccounts.${env}",
+          "name": "CLOUDWATCH_METRIC_NAMESPACE"
+        }
+      ],
+      "memoryReservation": 300,
+      "image": "${image}",
+      "stopTimeout": 120,
+      "name": "update-aws-accounts-${env}"
+    }
+]

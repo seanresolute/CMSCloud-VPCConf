@@ -1,0 +1,47 @@
+podTemplate(label: 'golang', envVars: [envVar(key: 'CGO_ENABLED', value: '0')], containers: [
+   containerTemplate(
+      name: 'golang', image: 'golang:1.18-alpine',ttyEnabled: true, command: 'cat',
+      resourceRequestCpu: '4000m',
+      resourceLimitCpu: '4000m',
+      resourceRequestMemory: '2Gi',
+      resourceLimitMemory: '2Gi')]
+ ){
+    node('golang') {
+        container('golang') {
+            stage('Test') {
+                checkout scm
+                dir('vpc-automation') {
+                    sh '''
+                        go test ./...
+                        go install golang.org/x/tools/cmd/goimports
+                        GO_FORMAT="$(goimports -l .)"
+                        if [[ "$GO_FORMAT" != "" ]]; then echo "Go files need formatting:"; echo "$GO_FORMAT"; false; fi
+                        GO_SIMPLIFY="$(gofmt -s -d .)"
+                        if [[ "$GO_SIMPLIFY" != "" ]]; then echo "Go files need simplifying:"; echo "$GO_SIMPLIFY"; false; fi
+                        go install honnef.co/go/tools/cmd/staticcheck@v0.3.3
+                        staticcheck -checks 'inherit,-ST1005' ./...
+                        go get github.com/mjibson/esc
+                        go install github.com/mjibson/esc
+                        d="$(mktemp -d)"
+                        for app in vpc-conf
+                        do
+                            echo $app
+                            grep -v modtime ./cmd/$app/gentpl.go > "$d"/committed.go  # ignore modified time
+                            go generate ./cmd/$app
+                            grep -v modtime ./cmd/$app/gentpl.go > "$d"/expected.go
+                            GENTPL_DIFF="$(diff "$d"/committed.go "$d"/expected.go || true)"  # suppress exit code
+                            if [[ "$GENTPL_DIFF" != "" ]]; then echo "Diffs found for $app/gentpl.go:"; echo "$GENTPL_DIFF"; false; break; fi
+                        done
+                        rm -r "$d"
+                        '''
+                }
+                sh '''
+                    wget https://releases.hashicorp.com/terraform/0.12.23/terraform_0.12.23_linux_amd64.zip
+                    unzip terraform_0.12.23_linux_amd64.zip
+                    TERRAFORM_FORMAT="$(./terraform fmt -write=false -recursive)"
+                    if [[ "$TERRAFORM_FORMAT" != "" ]]; then echo "Terraform files need formatting:"; echo "$TERRAFORM_FORMAT"; false; fi
+                    '''
+            }
+        }
+     }
+}

@@ -1,0 +1,44 @@
+# To export required VPC Conf environment variables, set AWS credentials for
+# the VPC Conf dev account and source this file in a Bash shell.
+#
+# Replace the "ssm_param" values with literals to eliminate the need for AWS
+# credentials. Retrieve the values from Parameter Store in AWS Systems Manager
+# or ask a teammate for them.
+
+function ssm_param {
+  aws --region=us-east-1 ssm get-parameter --name vpc-conf-dev-$1 --with-decryption --query Parameter.Value --output text
+}
+
+declare -x API_KEY_CONFIG='[{"principal":"local-dev","keys":["50m3r4nd0m4P1k3Y"]}]'
+declare -x CMSNET_CONFIG="null"
+declare -x CREDS_SVC_CONFIG="$(ssm_param creds-svc-config)"
+declare -x IPAM_DEV_MODE="1"
+declare -x POSTGRES_CONNECTION_STRING="postgresql://postgres:password@127.0.0.1:5432/postgres?sslmode=disable"
+declare -x WORKER_NAME="dev"
+
+declare -x AZURE_AD_CLIENT_ID="ca4aae61-e7cf-4f9f-9688-0f6e8f60d8a1"
+declare -x AZURE_AD_HOST="https://login.microsoftonline.us"
+declare -x AZURE_AD_REDIRECT_URL="http://localhost:2020/provision/oauth/callback"
+declare -x AZURE_AD_TENANT_ID="7c8bb92a-832a-4d12-8e7e-c569d7b232c9"
+
+declare -x CLOUDTAMER_ADMIN_GROUP_ID="901"
+declare -x CLOUDTAMER_BASE_URL="https://cloudtamer.cms.gov/api"
+declare -x CLOUDTAMER_IDMS_ID="2"
+declare -x CLOUDTAMER_READ_ONLY_GROUP_IDS="1526"
+declare -x CLOUDTAMER_SERVICE_ACCOUNT_IDMS_ID="2"
+declare -x CLOUDTAMER_SERVICE_ACCOUNT_PASSWORD="$(ssm_param cloudtamer-service-account-password)"
+declare -x CLOUDTAMER_SERVICE_ACCOUNT_USERNAME="$(ssm_param cloudtamer-service-account-username)"
+
+declare -x IPCONTROL_HOST="internal-ipcontrol-network-ipam-438345226.us-east-1.elb.amazonaws.com:8443"
+declare -x IPCONTROL_PASSWORD="$(ssm_param ipam-password)"
+declare -x IPCONTROL_USERNAME=vpc-conf-prod
+
+declare -x JIRA_CONFIG="$(ssm_param jira-config)"
+declare -x JIRA_ISSUE_LABELS="null"
+declare -x JIRA_OAUTH_CONFIG="$(ssm_param jira-oauth-config)"
+declare -x JIRA_USERNAME="$(ssm_param jira-username)"
+
+declare -x ORCHESTRATION_BASE_URL="$(ssm_param orchestration-base-url)"
+declare -x ORCHESTRATION_API_KEY="$(ssm_param orchestration-api-key)"
+
+unset -f ssm_param

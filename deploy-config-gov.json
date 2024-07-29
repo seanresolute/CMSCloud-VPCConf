@@ -1,0 +1,90 @@
+{
+  "ConfigAccountID": "350521122370",
+  "ConfigRegion": "us-gov-west-1",
+  "Apps": {
+    "creds-api": {
+      "ArtifactDBProjectName": "creds-api",
+      "ContainerDefinitionTemplates": [
+        {
+          "Image": "{{.Account}}.dkr.ecr.{{.Region}}.amazonaws.com/{{.Artifact.Value}}",
+          "LogConfiguration": {
+            "LogDriver": "awslogs",
+            "Options": {
+              "awslogs-group": "/aws/ecs/creds-api-{{.Environment}}",
+              "awslogs-region": "{{.Region}}",
+              "awslogs-stream-prefix": "ecs"
+            }
+          },
+          "PortMappings": [
+            {
+              "hostPort": 2023,
+              "protocol": "tcp",
+              "containerPort": 2023
+            }
+          ],
+          "secrets": [
+            {
+              "valueFrom": "creds-api-{{.Environment}}-api-key-config",
+              "name": "API_KEY_CONFIG"
+            },
+            {
+              "valueFrom": "creds-api-{{.Environment}}-is-govcloud",
+              "name": "IS_GOVCLOUD"
+            }
+          ],
+          "MemoryReservation": 300,
+          "StopTimeout": 120,
+          "Name": "creds-api-{{.Environment}}"
+        }
+      ],
+      "Environments": {
+        "dev": {
+          "AccountID": "350522771286",
+          "Region": "us-gov-west-1",
+          "CPU": "512",
+          "Memory": "1024",
+          "ExecutionRoleARN": "arn:aws-us-gov:iam::350522771286:role/creds-api-dev",
+          "TaskRoleARN": "arn:aws-us-gov:iam::350522771286:role/creds-api-dev",
+          "Family": "creds-api-dev",
+          "Cluster": "creds-api-dev",
+          "SecurityGroups": [
+            "sg-095a4685770d49cee"
+          ],
+          "Subnets": [
+            "subnet-0493eecb422c51e73",
+            "subnet-0859bae1425edc666",
+            "subnet-0f5c851b328d56316"
+          ],
+          "ListenerARN": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350522771286:listener/app/creds-api-dev/09bdc647944062aa/2f6690799fa801a7",
+          "TargetGroupARNs": {
+            "blue": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350522771286:targetgroup/creds-api-dev-blue/5ed3a3140c6c4a22",
+            "green": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350522771286:targetgroup/creds-api-dev-green/3d52cb4955a5a6b9"
+          }
+        },
+        "prod": {
+          "AccountID": "350521122370",
+          "Region": "us-gov-west-1",
+          "CPU": "512",
+          "Memory": "1024",
+          "ExecutionRoleARN": "arn:aws-us-gov:iam::350521122370:role/creds-api-prod",
+          "TaskRoleARN": "arn:aws-us-gov:iam::350521122370:role/creds-api-prod",
+          "Family": "creds-api-prod",
+          "Cluster": "creds-api-prod",
+          "SecurityGroups": [
+            "sg-03ecb12b6aa8ebbf1"
+          ],
+          "Subnets": [
+            "subnet-0e730c7729382c0e7",
+            "subnet-0c85361f15094a19c",
+            "subnet-088a5f273c7e25d1d"
+          ],
+          "ListenerARN": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350521122370:listener/app/creds-api-prod/f8740b6e82c836dc/b9f7076e4aaeb05e",
+          "TargetGroupARNs": {
+            "blue": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350521122370:targetgroup/creds-api-prod-blue/44a1f7928e48a505",
+            "green": "arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:350521122370:targetgroup/creds-api-prod-green/825437dee4cda5c6"
+          }
+        }
+      }
+    }
+  }
+}

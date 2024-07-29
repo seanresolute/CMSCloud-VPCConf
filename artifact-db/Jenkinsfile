@@ -1,0 +1,53 @@
+@Library('corbalt') _
+
+def pod = corbalt.getPodParams([go: 'golang:1.13-alpine', kaniko: 'gcr.io/kaniko-project/executor:debug-v0.22.0'])
+pod.nodeSelector = 'Agents=true'
+
+corbalt.inPod(pod) {
+    def sha
+
+    stage('Checkout') {
+        checkout scm
+        sha = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD').trim()
+    }
+
+    container('go') {
+        sh 'apk add git aws-cli'
+
+        withEnv(corbalt.getArtifactoryGoEnv() + ['CGO_ENABLED=0']) {
+            stage('Lint') {
+                sh 'go get golang.org/x/tools/cmd/goimports'
+                sh '! goimports -d . | grep .'
+            }
+
+            stage('Analyze') {
+                sh 'go get honnef.co/go/tools/cmd/staticcheck'
+                sh 'staticcheck ./...'
+            }
+
+            stage('Test') {
+                sh 'go test ./...'
+            }
+
+            stage('Upload') {
+                sh 'GOBIN=/ go install'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws']]) {
+                    sh "aws --region=us-east-1 s3 cp /artifact-db s3://artifact-db/${sha}/ --sse"
+                    if (env.BRANCH_NAME == 'master') {
+                        sh 'aws --region=us-east-1 s3 cp /artifact-db s3://artifact-db/latest/ --sse'
+                    }
+                }
+            }
+        }
+    }
+
+    stage('Build Docker Image') {
+        if (env.BRANCH_NAME == 'master') {
+            def destinationHost = 'artifactory.cms.gov'
+            def dockerConfig = corbalt.getDockerConfigForArtifactory()
+            def destinations = ["${destinationHost}/geoapi-jenkins-core-docker-local/geoapi-artifact-db:${sha}"]
+
+            corbalt.kanikoBuild(destinations, dockerConfig, dockerfile: 'Dockerfile-cloudbees-core', buildArgs: [GOPROXY: corbalt.getArtifactoryGoProxyUrl()])
+        }
+    }
+}
