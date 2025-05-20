@@ -33,6 +33,34 @@ import (
 )
 
 func main() {
+	// Set environment variables from vpc-conf-dev.env
+	os.Setenv("API_KEY_CONFIG", `[{"principal":"local-dev","keys":["50m3r4nd0m4P1k3Y"]}]`)
+	os.Setenv("CMSNET_CONFIG", `null`)
+	os.Setenv("IPAM_DEV_MODE", `0`)
+	os.Setenv("POSTGRES_CONNECTION_STRING", `postgresql://postgres:QFO0EAlQq3050VpuKg@vpc-conf-dev.cbkdyavbhvkm.us-east-1.rds.amazonaws.com:5432/vpcconfdev`)
+	os.Setenv("WORKER_NAME", `vpc-conf-dev:40`)
+	os.Setenv("AZURE_AD_CLIENT_ID", `ca4aae61-e7cf-4f9f-9688-0f6e8f60d8a1`)
+	os.Setenv("AZURE_AD_HOST", `https://login.microsoftonline.us`)
+	os.Setenv("AZURE_AD_REDIRECT_URL", `http://localhost:2020/provision/oauth/callback`)
+	os.Setenv("AZURE_AD_TENANT_ID", `7c8bb92a-832a-4d12-8e7e-c569d7b232c9`)
+	os.Setenv("CLOUDTAMER_ADMIN_GROUP_ID", `901`)
+	os.Setenv("CLOUDTAMER_BASE_URL", `https://cloudtamer.cms.gov/api`)
+	os.Setenv("CLOUDTAMER_IDMS_ID", `2`)
+	os.Setenv("CLOUDTAMER_READ_ONLY_GROUP_IDS", `1526`)
+	os.Setenv("CLOUDTAMER_SERVICE_ACCOUNT_IDMS_ID", `2`)
+	os.Setenv("IPCONTROL_HOST", `internal-ipcontrol-network-ipam-438345226.us-east-1.elb.amazonaws.com:8443`)
+	os.Setenv("IPCONTROL_USERNAME", `vpc-conf-prod`)
+	os.Setenv("JIRA_ISSUE_LABELS", `null`)
+	os.Setenv("CLOUDTAMER_SERVICE_ACCOUNT_PASSWORD", `aknCfdFg129ndI`)
+	os.Setenv("CLOUDTAMER_SERVICE_ACCOUNT_USERNAME", `vpcconf-svc`)
+	os.Setenv("CREDS_SVC_CONFIG", `{"Commercial":{"APIKey":"BEVFVpM8tzUxhKph","Host":"https://dev.creds-api.west.cms.gov","Role": "cms-cloud-admin/ct-cms-cloud-ia-operations"},"GovCloud":{"APIKey":"QVbzv3ER0CZt63y5","Host":"https://dev.creds-api-gc.west.cms.gov","Role":"cms-cloud-admin/ct-cms-cloud-ia-operations-gov"}}`)
+	os.Setenv("IPCONTROL_PASSWORD", `bAZxObrxcbzSM5Lp6Q`)
+	os.Setenv("JIRA_CONFIG", `{"Project": "IA","IssueType": "10007","Statuses": {"10102": "Submitted","3": "InProgress","10004": "CancelledByRequester","10103": "Approved","10016": "Done"},"Watchers": [],"Assignee": "LOVP"}`)
+	os.Setenv("JIRA_OAUTH_CONFIG", `{"ConsumerKey":"CCG-PROD-HBNL-ACON-SetupD-12022019","PrivateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQCurKrQr+J27n36w7K3KHOI78HrvVA82/vXnJSwoMKbX/vie5Rg\nkpwjpw5IurL7g91MLPwT4qMTAet3SeMTCakfw2DFQtPpiIQHT6q2XjfwIaYnJck7\nmWtKqK/J8NQ3GwA82t6k9+5Xoiyfrd2NHCUCjiwzTjQuW62/xXKFRQKaSQIDAQAB\nAoGBAK2ghMqbioid2CwDiwn086MSb7hcnf1gzZ0sz8AijE7VwhMGtB6qnPnzfIde\nzbqlALxPmuJJTb//EIeqskSiPbDm9c3ppm/rjNIpnmrXgcvR7qqOWC986k/Trwxe\nKOxrlAEOq1p0Pdfh+o5sHw00Jgf7PiBUJW/aP/NAu7me+KPhAkEA50+FZMY4h24q\n9CeShDSnZEDHq+iaDjOiEexzchO+pSG9gHE2RKdGqxsu3IP3E8QwQ22iqWa/Yapp\ntzevyYm8ywJBAMFRlYG7+k9Y9WNmo7/utejVZoerAZkzRSB3Ugq5gznaLBhDtbBi\nVpngTSwXDtYosDVHluQYlg4qZFtyF7481rsCQHWwpz1kAaUer6o0bD7qD3VZ5H4a\nRjANo1udRAv58dlRNnsgny0FM1ah6RD38AHVo3zbTpUEm0GVFF7NbZqMg0sCQA9t\nYU7/H1ShtsN992djt2SjUxFUlkYRj1yt6QAuGcjOHmK5VJCE6IBTJBV2qZpxmM5H\nrkT5qU/sFiIuErL9y+0CQHZ+vB4mpEPQnZfwdIhakcK8e/MR9B4P6J9QKKeeUByv\nbBg8JvuBjcImNy2dDePIJDOaRQY7Xg4SYw+/ggtIu0M=\n-----END RSA PRIVATE KEY-----","Token":"P7ujAynN0RJyO006FJjtr7bYLFgjwptJ"}`)
+	os.Setenv("JIRA_USERNAME", `west_infra_jira_ent`)
+	os.Setenv("ORCHESTRATION_API_KEY", `0_11b7dea6_06903bb620ca14973a2bd05b565ff196fcbbc15fad8f502e38183db6ff679f1c`)
+	os.Setenv("ORCHESTRATION_BASE_URL", `https://api.service-provisioning-dev.cloud.internal.cms.gov/api/v1/vpc-conf/`)
+
 	devMode := os.Getenv("IPAM_DEV_MODE") == "1" // if true, make sure to change to ipam-web directory before running ipam-web
 
 	postgresConnectionString := os.Getenv("POSTGRES_CONNECTION_STRING")
