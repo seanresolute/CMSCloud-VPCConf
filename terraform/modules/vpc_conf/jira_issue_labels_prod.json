@@ -1,5 +1,0 @@
-{
-	"NewRequest": "QuickVPC_Request",
-	"NewSubnets": "QuickVPC_Additional_Subnets_Request",
-	"ManualApproval": "AutoVPC_Manual_Approval"
-}
