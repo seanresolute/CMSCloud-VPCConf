@@ -71,3 +71,5 @@ __pycache__/
 
 # Ignore node_modules (if any JS tooling)
 node_modules/
+
+.terraform/
