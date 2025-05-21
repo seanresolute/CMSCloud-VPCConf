@@ -1,5 +1,18 @@
 # VPC Conf
 
+## New build and deploy simplified.
+
+```
+GOOS=windows GOARCH=amd64 go build -o vpc-conf.exe ./cmd/vpc-conf/
+```
+
+Use NSSM on Windows: https://nssm.cc/download
+
+```
+nssm install vpc-conf
+nssm start vpc-conf
+```
+
 Paths below are relative to the `vpc-automation` directory.
 
 ## Setup
@@ -139,7 +152,7 @@ With AWS CLI >= 1.17.10:
 
 ```
 SHA=$(git rev-parse --short=8 HEAD)
-docker build -t vpc-conf:$SHA . -f vpc-conf.Dockerfile .
+docker build -t vpc-conf:$SHA -f vpc-conf.Dockerfile .
 for REGION in us-east-1 us-west-2
 do
  aws ecr get-login-password --region=$REGION |  docker login --username AWS --password-stdin $(aws sts get-caller-identity --output text --query Account).dkr.ecr.$REGION.amazonaws.com

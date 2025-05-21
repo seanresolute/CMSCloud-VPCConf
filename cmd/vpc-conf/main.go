@@ -41,7 +41,7 @@ func main() {
 	os.Setenv("WORKER_NAME", `vpc-conf-dev:40`)
 	os.Setenv("AZURE_AD_CLIENT_ID", `ca4aae61-e7cf-4f9f-9688-0f6e8f60d8a1`)
 	os.Setenv("AZURE_AD_HOST", `https://login.microsoftonline.us`)
-	os.Setenv("AZURE_AD_REDIRECT_URL", `http://localhost:2020/provision/oauth/callback`)
+	os.Setenv("AZURE_AD_REDIRECT_URL", `https://dev.vpc-conf.actually-east.west.cms.gov/provision/oauth/callback`)
 	os.Setenv("AZURE_AD_TENANT_ID", `7c8bb92a-832a-4d12-8e7e-c569d7b232c9`)
 	os.Setenv("CLOUDTAMER_ADMIN_GROUP_ID", `901`)
 	os.Setenv("CLOUDTAMER_BASE_URL", `https://cloudtamer.cms.gov/api`)
